@@ -8,9 +8,6 @@ COPY ./go.mod /app/go.mod
 COPY ./go.sum /app/go.sum
 COPY ./api /app/api
 COPY ./static/shoppingcart/build/ /app/static/shoppingcart/build/
-COPY entrypoint.sh /app/entrypoint.sh
-
-RUN chmod +x /app/entrypoint.sh
 
 # Install PostgreSQL client and golang-migrate
 RUN apt-get update && \
@@ -22,15 +19,18 @@ RUN apt-get update && \
 ENV DB_HOST=localhost
 ENV DB_PORT=5432
 ENV DB_USER=shopper
-ENV DB_PASSWORD=sh0p
+ENV DB_PASS=sh0p
 ENV DB_NAME=shopping_cart
+ENV VERSION=1.0
+
+COPY pg_hba.conf /etc/postgresql/13/main/pg_hba.conf
+RUN echo "listen_addresses = '*'" >> /etc/postgresql/13/main/postgresql.conf
 
 RUN go build -o /app/shoppingcart
-#ENTRYPOINT [ "/app/entrypoint.sh" ]
 CMD service postgresql start && \
     sleep 5 && \
-    sudo -u postgres psql -c "CREATE USER shopper WITH PASSWORD '${DB_PASSWORD}';" && \
+    sudo -u postgres psql -c "CREATE USER shopper WITH PASSWORD '${DB_PASS}';" && \
     sudo -u postgres createdb -O ${DB_USER} ${DB_NAME} && \
-    migrate -path=/app/migrations -database=postgres://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}?sslmode=disable up && \
+    migrate -path=/app/migrations -database=postgres://${DB_USER}:${DB_PASS}@${DB_HOST}:${DB_PORT}/${DB_NAME}?sslmode=disable up && \
     /app/shoppingcart
 

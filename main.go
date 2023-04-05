@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"log"
 	"net/http"
@@ -11,9 +12,15 @@ import (
 	"strings"
 	"syscall"
 	"time"
+	"veritone/api"
+
+	"github.com/joho/godotenv"
+	_ "github.com/lib/pq"
 
 	"github.com/gorilla/mux"
 )
+
+var db *sql.DB
 
 func serveRootDirectory(w http.ResponseWriter, r *http.Request) {
 	var (
@@ -39,19 +46,20 @@ func serveRootDirectory(w http.ResponseWriter, r *http.Request) {
 }
 
 func accessControlMiddleware(next http.Handler) http.Handler {
+	fmt.Println("in middleware")
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// Normally this is where I would handle auth and/or CORS headers
 
 		// Adding a timeout for REST endpoints
 		ctx, cancel := context.WithTimeout(r.Context(), time.Duration(time.Second*5))
 		defer cancel()
-		r = r.WithContext(ctx)
-		next.ServeHTTP(w, r)
+		ctx = context.WithValue(ctx, "db", db)
+		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }
 
 const (
-	port           = ":80"
+	httpPort       = ":80"
 	staticFilesDir = "static/shoppingcart/build"
 	servicePath    = "/api"
 )
@@ -60,15 +68,44 @@ func main() {
 	c := make(chan os.Signal)
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
 	go func() {
-		fmt.Println("wtf")
 		<-c
 		os.Exit(1)
 	}()
 
+	err := godotenv.Load()
+	if err != nil {
+		log.Println("Unable to load .env file", err)
+	}
+	dbUser := os.Getenv("DB_USER")
+	dbPass := os.Getenv("DB_PASS")
+	dbHost := os.Getenv("DB_HOST")
+	dbName := os.Getenv("DB_NAME")
+	dbPort := os.Getenv("DB_PORT")
+
+	if dbUser == "" || dbPass == "" || dbHost == "" || dbName == "" {
+		log.Fatal("Missing DB environmental params")
+	}
 	fmt.Println("Launching ShoppingCart version", os.Getenv("VERSION"))
-	fmt.Println("Listening for http on " + port)
+	psqlInfo := fmt.Sprintf("user=%s password=%s dbname=%s sslmode=disable host=%s port=%s", dbUser, dbPass, dbName, dbHost, dbPort)
+	db, err = sql.Open("postgres", psqlInfo)
+	if err != nil {
+		panic(err)
+	}
+	defer db.Close()
+	err = db.Ping()
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println("Connected to database on port", dbPort)
+
+	fmt.Println("Listening for http on " + httpPort)
 	rtr := mux.NewRouter()
+
+	apiPath := rtr.PathPrefix(servicePath).Subrouter()
+	apiPath.Use(accessControlMiddleware)
+	apiPath.HandleFunc("/products", api.GetAllProducts).Methods("GET", "OPTIONS")
+
 	rtr.PathPrefix("/").HandlerFunc(serveRootDirectory)
 	http.Handle("/", rtr)
-	log.Fatal(http.ListenAndServe(port, nil))
+	log.Fatal(http.ListenAndServe(httpPort, nil))
 }
