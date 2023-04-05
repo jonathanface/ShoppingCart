@@ -1,0 +1,29 @@
+html, body {
+    margin:0;
+    padding:0;
+}
+
+body {
+    
+    color:#FFF;
+    box-sizing: border-box;
+    font-size:18px;
+    font-family:"Nunito", sans-serif;
+}
+
+header {
+    background-color:#4C80B6;
+    padding:20px;
+    font-weight:bold;
+    letter-spacing: 1px;
+    font-family: 'Dosis', sans-serif;
+}
+
+main {
+    text-align:center;
+    
+}
+
+.MuiButton-contained {
+    text-transform:none !important;
+}

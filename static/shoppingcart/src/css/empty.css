@@ -1,0 +1,14 @@
+.empty-container {
+    border:1px solid lightgray;
+    width:450px;
+    border-radius:5px;
+    margin:0 auto;
+    margin-top:100px;
+    color:gray;
+    padding:80px;
+    
+}
+
+.empty-container button {
+    margin-top:20px;
+}
