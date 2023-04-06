@@ -7,6 +7,7 @@ COPY main.go /app/main.go
 COPY ./go.mod /app/go.mod
 COPY ./go.sum /app/go.sum
 COPY ./api /app/api
+COPY ./sessions /app/sessions
 COPY ./static/shoppingcart/build/ /app/static/shoppingcart/build/
 
 # Install PostgreSQL client and golang-migrate

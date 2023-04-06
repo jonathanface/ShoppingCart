@@ -103,7 +103,8 @@ func main() {
 
 	apiPath := rtr.PathPrefix(servicePath).Subrouter()
 	apiPath.Use(accessControlMiddleware)
-	apiPath.HandleFunc("/products", api.GetAllProducts).Methods("GET", "OPTIONS")
+	apiPath.HandleFunc("/items", api.GetAllItems).Methods("GET", "OPTIONS")
+	apiPath.HandleFunc("/items/put", api.PutListItem).Methods("PUT", "OPTIONS")
 
 	rtr.PathPrefix("/").HandlerFunc(serveRootDirectory)
 	http.Handle("/", rtr)

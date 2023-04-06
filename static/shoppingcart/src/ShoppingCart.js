@@ -1,6 +1,7 @@
 import React, {useEffect} from 'react';
 import Empty from './sections/Landing/Empty'
 import './css/main.css';
+import AddItem from './sections/AddItem/AddItem';
 
 const ShoppingCart = () => {
 
@@ -12,6 +13,7 @@ const ShoppingCart = () => {
             <header>SHOPPING LIST</header>
             <main>
                 <Empty/>
+                <AddItem />
             </main>
             
         </div>

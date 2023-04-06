@@ -1,9 +1,12 @@
 BEGIN TRANSACTION;
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
-CREATE TABLE IF NOT EXISTS items (
+CREATE TABLE IF NOT EXISTS list_items (
     item_id uuid DEFAULT uuid_generate_v4(),
-    name TEXT UNIQUE NOT NULL,
+    list_id uuid NOT NULL,
+    name TEXT NOT NULL,
     description TEXT NOT NULL,
+    quantity int NOT NULL DEFAULT 1,
     PRIMARY KEY (item_id)
 );
+CREATE INDEX IF NOT EXISTS list_id_idx ON list_items (list_id);
 END TRANSACTION;

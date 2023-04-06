@@ -5,39 +5,57 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"veritone/sessions"
 
-	"github.com/google/uuid"
+	"github.com/gofrs/uuid"
 )
 
-type Product struct {
+type Item struct {
 	ID          uuid.UUID `json:"id"`
 	Name        string    `json:"name"`
 	Description string    `json:"description"`
+	Quantity    int       `json:"quantity"`
 }
 
-func GetAllProducts(w http.ResponseWriter, r *http.Request) {
+func GetAllItems(w http.ResponseWriter, r *http.Request) {
+	sess, err := sessions.Get(r, "shopping_list")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	if sess.Values["list-id"] == "" {
+		http.Error(w, err.Error(), http.StatusNotFound)
+		return
+	}
+
 	db := r.Context().Value("db").(*sql.DB)
-	fmt.Println("db", db)
-	rows, err := db.Query("SELECT item_id, name, description FROM items")
+	stmt, err := db.Prepare("SELECT item_id, name, description FROM list_items WHERE list_id=$1")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	defer stmt.Close()
+
+	rows, err := stmt.Query(sess.Values["list-id"])
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 	defer rows.Close()
 
-	// Iterate over rows and create Product objects
-	var products []Product
+	// Iterate over rows and create item objects
+	var items []Item
 	for rows.Next() {
-		var product Product
-		err := rows.Scan(&product.ID, &product.Name, &product.Description)
+		var item Item
+		err := rows.Scan(&item.ID, &item.Name, &item.Description)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		products = append(products, product)
+		items = append(items, item)
 	}
-
+	fmt.Println("sending back", items)
 	// Convert products to JSON and write to response
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(products)
+	json.NewEncoder(w).Encode(items)
 }

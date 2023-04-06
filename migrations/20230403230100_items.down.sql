@@ -1,3 +1,0 @@
-BEGIN TRANSACTION;
-DELETE FROM shopping_cart.items;
-END TRANSACTION;

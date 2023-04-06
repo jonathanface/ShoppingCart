@@ -1,0 +1,20 @@
+
+.overlay {
+    color:#767a80;
+}
+.overlay header {
+    background-color: #fafafa;
+    border:1px solid #ebf0f3;
+}
+.overlay header svg {
+    float:right;
+    cursor:pointer;
+}
+.overlay header svg:hover {
+    opacity: 0.8;
+}
+
+.overlay h4 {
+    margin-top:0;
+    margin-bottom:0;
+}
