@@ -58,7 +58,7 @@ func PutListItem(w http.ResponseWriter, r *http.Request) {
 	purchased := strconv.FormatBool(listItem.Purchased)
 	db := r.Context().Value("db").(*sql.DB)
 	var stmt *sql.Stmt
-	stmt, err = db.Prepare("INSERT INTO list_items (item_id, list_id, name, description, quantity, purchased) VALUES($1, $2, $3, $4, $5, $6) ON CONFLICT (item_id) DO UPDATE SET description=EXCLUDED.description, quantity=EXCLUDED.quantity, purchased=EXCLUDED.purchased RETURNING item_id")
+	stmt, err = db.Prepare("INSERT INTO list_items (item_id, list_id, name, description, quantity, purchased) VALUES($1, $2, $3, $4, $5, $6) ON CONFLICT (item_id) DO UPDATE SET name=EXCLUDED.name, description=EXCLUDED.description, quantity=EXCLUDED.quantity, purchased=EXCLUDED.purchased RETURNING item_id")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

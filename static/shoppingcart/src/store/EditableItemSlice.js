@@ -5,8 +5,8 @@ export const EditableItemSlice = createSlice({
   initialState: {
     editingID: null,
     editingQty: 1,
-    editingName: "",
-    editingDescr: "",
+    editingName: '',
+    editingDescr: '',
     editingPurchased: false,
     inEditMode: false
   },
@@ -24,8 +24,8 @@ export const EditableItemSlice = createSlice({
     resetEditableItem: (state) => {
       state.editingID = null;
       state.editingQty = 1;
-      state.editingName = "";
-      state.editingDescr = "";
+      state.editingName = '';
+      state.editingDescr = '';
       state.editingPurchased = false;
     }
   }

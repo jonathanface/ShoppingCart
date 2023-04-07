@@ -1,6 +1,6 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
+import {createSlice, createAsyncThunk} from '@reduxjs/toolkit';
 export const getItems = createAsyncThunk('api/items', async () => {
-  const response = await fetch('api/items').then(response => {
+  const response = await fetch('api/items').then((response) => {
     if (response.ok) {
       return response.json();
     }
@@ -24,21 +24,21 @@ export const ItemsSlice = createSlice({
   extraReducers: (builder) => {
     builder.addCase(getItems.pending, (state, action) => {
       if (state.loading === 'idle') {
-        state.loading = 'pending'
+        state.loading = 'pending';
       }
-    })
+    });
     builder.addCase(getItems.fulfilled, (state, action) => {
       if (state.loading === 'pending') {
-        state.items = action.payload
-        state.loading = 'idle'
+        state.items = action.payload;
+        state.loading = 'idle';
       }
-    })
+    });
     builder.addCase(getItems.rejected, (state, action) => {
       if (state.loading === 'pending') {
-        state.loading = 'idle'
-        state.error = 'Error occured'
+        state.loading = 'idle';
+        state.error = 'Error occured';
       }
-    })
+    });
   },
-})
-export default ItemsSlice.reducer
+});
+export default ItemsSlice.reducer;
