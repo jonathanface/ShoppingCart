@@ -1,7 +1,7 @@
 import React, {useEffect} from 'react';
 import Empty from './sections/Landing/Empty'
 import './css/main.css';
-import AddItem from './sections/AddItem/AddItem';
+import AddOrEditItem from './sections/AddOrEditItem/AddOrEditItem';
 import { getItems } from './store/ItemsSlice'
 import {useSelector, useDispatch} from 'react-redux';
 import ItemsList from './sections/ItemsList/ItemsList'
@@ -19,7 +19,7 @@ const ShoppingCart = () => {
         <div>
             <header>SHOPPING LIST</header>
             <main>
-            {items && items.length ? <ItemsList/> :  <div><Empty/><AddItem/></div>}
+            {items && items.length ? <ItemsList/> :  <div><Empty/><AddOrEditItem/></div>}
             </main>
             
         </div>

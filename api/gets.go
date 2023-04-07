@@ -6,16 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"veritone/sessions"
-
-	"github.com/gofrs/uuid"
 )
-
-type Item struct {
-	ID          uuid.UUID `json:"id"`
-	Name        string    `json:"name"`
-	Description string    `json:"description"`
-	Quantity    int       `json:"quantity"`
-}
 
 func GetAllItems(w http.ResponseWriter, r *http.Request) {
 	sess, err := sessions.Get(r, "shopping_list")
@@ -29,7 +20,7 @@ func GetAllItems(w http.ResponseWriter, r *http.Request) {
 	}
 
 	db := r.Context().Value("db").(*sql.DB)
-	stmt, err := db.Prepare("SELECT item_id, name, description FROM list_items WHERE list_id=$1")
+	stmt, err := db.Prepare("SELECT item_id, name, description, purchased FROM list_items WHERE list_id=$1")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -47,7 +38,7 @@ func GetAllItems(w http.ResponseWriter, r *http.Request) {
 	var items []Item
 	for rows.Next() {
 		var item Item
-		err := rows.Scan(&item.ID, &item.Name, &item.Description)
+		err := rows.Scan(&item.ID, &item.Name, &item.Description, &item.Purchased)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return

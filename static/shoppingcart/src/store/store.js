@@ -1,10 +1,10 @@
 import {configureStore} from '@reduxjs/toolkit';
-import AddingItemSlice from './AddingItemSlice';
+import AddingOrEditingItemSlice from './AddingOrEditingItemSlice';
 import ItemsSlice from './ItemsSlice';
 
 export default configureStore({
   reducer: {
-    isAddingItem: AddingItemSlice,
+    isAddingOrEditingItem: AddingOrEditingItemSlice,
     items: ItemsSlice
   },
 });

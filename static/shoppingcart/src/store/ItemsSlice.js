@@ -1,5 +1,4 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
-//import axios from 'axios'
 export const getItems = createAsyncThunk('api/items', async () => {
   const response = await fetch('api/items').then(response => {
     if (response.ok) {

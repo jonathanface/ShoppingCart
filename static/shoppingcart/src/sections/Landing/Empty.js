@@ -2,7 +2,7 @@ import React from "react";
 import Button from '@mui/material/Button';
 import '../../css/empty.css';
 import {useDispatch} from 'react-redux';
-import { flipAddingItemState } from "../../store/AddingItemSlice";
+import { flipAddingOrEditingItemState } from "../../store/AddingOrEditingItemSlice";
 
 const Empty = () => {
 
@@ -13,7 +13,7 @@ const Empty = () => {
             <div>Your shopping list is empty :(</div>
             <div>
                 <Button variant="contained" onClick={()=>{
-                    dispatch(flipAddingItemState());
+                    dispatch(flipAddingOrEditingItemState());
                 }}>Add your first item</Button>
             </div>
         </div>

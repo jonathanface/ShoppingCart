@@ -31,6 +31,10 @@
     margin-bottom:5px;
 }
 
+.overlay #quantity-required {
+    padding:10px;
+}
+
 .overlay .error {
     margin-left:10px;
     font-weight:bold;

@@ -36,7 +36,6 @@ func serveRootDirectory(w http.ResponseWriter, r *http.Request) {
 	if _, err := os.Stat(truePath); os.IsNotExist(err) {
 		// return an error if this is a missing API request
 		if strings.Contains(r.URL.Path, servicePath) {
-			//api.RespondWithError(w, http.StatusNotFound, err.Error())
 			return
 		}
 		http.StripPrefix(r.URL.Path, http.FileServer(http.Dir(staticFilesDir))).ServeHTTP(w, r)
@@ -46,7 +45,6 @@ func serveRootDirectory(w http.ResponseWriter, r *http.Request) {
 }
 
 func accessControlMiddleware(next http.Handler) http.Handler {
-	fmt.Println("in middleware")
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// Normally this is where I would handle auth and/or CORS headers
 
@@ -89,12 +87,12 @@ func main() {
 	psqlInfo := fmt.Sprintf("user=%s password=%s dbname=%s sslmode=disable host=%s port=%s", dbUser, dbPass, dbName, dbHost, dbPort)
 	db, err = sql.Open("postgres", psqlInfo)
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 	defer db.Close()
 	err = db.Ping()
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 	fmt.Println("Connected to database on port", dbPort)
 
@@ -105,6 +103,7 @@ func main() {
 	apiPath.Use(accessControlMiddleware)
 	apiPath.HandleFunc("/items", api.GetAllItems).Methods("GET", "OPTIONS")
 	apiPath.HandleFunc("/items/put", api.PutListItem).Methods("PUT", "OPTIONS")
+	apiPath.HandleFunc("/items/transact", api.TogglePurchaseState).Methods("PUT", "OPTIONS")
 	apiPath.HandleFunc("/items", api.DeleteItems).Methods("DELETE", "OPTIONS")
 
 	rtr.PathPrefix("/").HandlerFunc(serveRootDirectory)

@@ -11,30 +11,43 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import Checkbox from '@mui/material/Checkbox';
 import Typography from '@mui/material/Typography';
-import { flipAddingItemState } from '../../store/AddingItemSlice';
+import { flipAddingOrEditingItemState } from '../../store/AddingOrEditingItemSlice';
 import '../../css/list.css';
 import { getItems } from '../../store/ItemsSlice'
 
 const ItemsList = () => {
-    const [checked, setChecked] = useState([]);
+    
     const { items, loading, error } = useSelector((state) => state.items);
+    const [checked, setChecked] = useState(items.filter(item => item.purchased).map(item => item.id));
     const dispatch = useDispatch();
+    console.log("checked", checked)
 
-    useEffect(() => {
-        checked.forEach(item => {
-            console.log(item)
-        });
-    }, [checked]);
-
-    const handleToggle = (labelId) => () => {
-        const currentIndex = checked.indexOf(labelId);
-        const newChecked = [...checked];
+    const handlePurchasedToggle = (itemID) => () => {
+        const currentIndex = checked.indexOf(itemID);
+        console.log("isChecked", itemID, checked);
+        let newChecked = [...checked];
+        const params = {};
+        params.id = itemID;
+        params.purchased = false;
         if (currentIndex === -1) {
-            newChecked.push(labelId);
+            params.purchased = true;
+            newChecked.push(itemID);
         } else {
             newChecked.splice(currentIndex, 1);
         }
+        console.log("new", newChecked);
         setChecked(newChecked);
+        fetch('/api/items/transact', {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(params)
+        }).then((response) => {
+            if (response.ok) {
+                dispatch(getItems())
+            }
+        });
     };
 
     const handleDelete = (id) => {
@@ -57,10 +70,9 @@ const ItemsList = () => {
         console.log("edit", id)
     }
 
-    const elements = items.map((item, index) => {
-        const labelId = 'checkbox-list-label-' + index;
-        const checkedClass =  checked.indexOf(labelId) > -1 ? "checked-item" : ""
-        const nameLabelColor = checked.indexOf(labelId) > -1 ? "#1976d2" : "#333"
+    const elements = items.map(item => {
+        const checkedClass =  checked.indexOf(item.id) > -1 ? "checked-item" : ""
+        const nameLabelColor = checked.indexOf(item.id) > -1 ? "#1976d2" : "#333"
         return (
             <ListItem key={item.id} className={checkedClass}
                 sx={{
@@ -81,17 +93,16 @@ const ItemsList = () => {
                     </div>
                 }
                 quantity={item.quantity}>
-                <ListItemButton role={undefined} onClick={handleToggle(labelId)} sx={{
+                <ListItemButton role={undefined} onClick={handlePurchasedToggle(item.id)} sx={{
                     maxWidth: '50px',
                     paddingRight: '0 !important'
                 }}>
                     <ListItemIcon>
                         <Checkbox
                             edge="start"
-                            checked={checked.indexOf(labelId) !== -1}
+                            checked={checked.indexOf(item.id) !== -1}
                             tabIndex={-1}
-                            disableRipple
-                            inputProps={{ 'aria-labelledby': labelId }}
+                            inputProps={{ 'aria-labelledby': item.id }}
                         />
                     </ListItemIcon>
                 </ListItemButton>
@@ -109,7 +120,7 @@ const ItemsList = () => {
             <header>
                 <h4>Your Items</h4>
                 <Button variant="contained" onClick={()=>{
-                    dispatch(flipAddingItemState());
+                    dispatch(flipAddingOrEditingItemState());
                 }} sx={{
                     float:'right',
                     marginTop:'15px',

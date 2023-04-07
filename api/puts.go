@@ -3,8 +3,8 @@ package api
 import (
 	"database/sql"
 	"encoding/json"
-	"fmt"
 	"net/http"
+	"strconv"
 	"veritone/sessions"
 
 	"github.com/gofrs/uuid"
@@ -12,7 +12,6 @@ import (
 
 func PutListItem(w http.ResponseWriter, r *http.Request) {
 	sess, err := sessions.Get(r, "shopping_list")
-	fmt.Println("SESSION?", sess.Values["list-id"])
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
@@ -59,7 +58,6 @@ func PutListItem(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	fmt.Println("inserting with", listItem.ID)
 	rows, err := stmt.Query(listItem.ID, listID, listItem.Name, listItem.Description, listItem.Quantity)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -68,7 +66,6 @@ func PutListItem(w http.ResponseWriter, r *http.Request) {
 	defer rows.Close()
 	if rows.Next() {
 		err := rows.Scan(&listItem.ID)
-		fmt.Println("scanned", listItem.ID)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
@@ -77,4 +74,44 @@ func PutListItem(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(listItem)
+}
+
+func TogglePurchaseState(w http.ResponseWriter, r *http.Request) {
+	sess, err := sessions.Get(r, "shopping_list")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	if sess.IsNew {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	decoder := json.NewDecoder(r.Body)
+	listItem := Item{}
+	if err = decoder.Decode(&listItem); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	if listItem.ID.IsNil() {
+		http.Error(w, "item ID missing or invalid", http.StatusBadRequest)
+		return
+	}
+
+	db := r.Context().Value("db").(*sql.DB)
+	var stmt *sql.Stmt
+	stmt, err = db.Prepare("UPDATE list_items SET purchased=$1 WHERE item_id=$2")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	defer stmt.Close()
+	purchased := strconv.FormatBool(listItem.Purchased)
+	results, err := stmt.Exec(purchased, listItem.ID)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(results)
 }
