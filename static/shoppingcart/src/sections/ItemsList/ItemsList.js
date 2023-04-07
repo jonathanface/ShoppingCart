@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {useSelector, useDispatch} from 'react-redux';
 import IconButton from '@mui/material/IconButton';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -19,7 +19,10 @@ import { setEditableItem, setInEditMode } from '../../store/EditableItemSlice';
 const ItemsList = () => {
     
     const { items, loading, error } = useSelector((state) => state.items);
-    const [checked, setChecked] = useState(items.filter(item => item.purchased).map(item => item.id));
+    const [checked, setChecked] = useState(items.filter(item => item.purchased === true).map(item => item.id));
+    useEffect(() => {
+        setChecked(items.filter(item => item.purchased).map(item => item.id));
+      }, [items]);
     const dispatch = useDispatch();
 
     const handlePurchasedToggle = (itemID) => () => {

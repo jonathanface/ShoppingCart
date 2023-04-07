@@ -32,3 +32,6 @@ main {
     margin:0 !important;
     margin-bottom:16px !important;
 }
+.MuiFormControlLabel-label {
+    padding-top:3px;
+}

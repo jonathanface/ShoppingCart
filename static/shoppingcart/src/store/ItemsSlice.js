@@ -29,7 +29,6 @@ export const ItemsSlice = createSlice({
     })
     builder.addCase(getItems.fulfilled, (state, action) => {
       if (state.loading === 'pending') {
-        console.log("data", action);
         state.items = action.payload
         state.loading = 'idle'
       }

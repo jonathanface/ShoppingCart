@@ -3,7 +3,6 @@ package api
 import (
 	"database/sql"
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"strconv"
 	"veritone/sessions"
@@ -31,7 +30,6 @@ func PutListItem(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	//db := r.Context().Value("db").(*sql.DB)
 	decoder := json.NewDecoder(r.Body)
 	listItem := Item{}
 	if err = decoder.Decode(&listItem); err != nil {
@@ -45,11 +43,10 @@ func PutListItem(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-	fmt.Println("putting", listItem.Quantity)
-
+	purchased := strconv.FormatBool(listItem.Purchased)
 	db := r.Context().Value("db").(*sql.DB)
 	var stmt *sql.Stmt
-	stmt, err = db.Prepare("INSERT INTO list_items (item_id, list_id, name, description, quantity) VALUES($1, $2, $3, $4, $5) ON CONFLICT (item_id) DO UPDATE SET description=EXCLUDED.description, quantity=EXCLUDED.quantity RETURNING item_id")
+	stmt, err = db.Prepare("INSERT INTO list_items (item_id, list_id, name, description, quantity, purchased) VALUES($1, $2, $3, $4, $5, $6) ON CONFLICT (item_id) DO UPDATE SET description=EXCLUDED.description, quantity=EXCLUDED.quantity, purchased=EXCLUDED.purchased RETURNING item_id")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -60,7 +57,7 @@ func PutListItem(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	rows, err := stmt.Query(listItem.ID, listID, listItem.Name, listItem.Description, listItem.Quantity)
+	rows, err := stmt.Query(listItem.ID, listID, listItem.Name, listItem.Description, listItem.Quantity, purchased)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

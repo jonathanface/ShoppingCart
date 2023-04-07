@@ -8,22 +8,27 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import {setAddingOrEditingItemState} from '../../store/AddingOrEditingItemSlice';
 import FormControl from '@mui/material/FormControl';
+import FormControlLabel from '@mui/material/FormControlLabel';
 import Select from '@mui/material/Select';
 import InputLabel from '@mui/material/InputLabel';
 import FormHelperText from '@mui/material/FormHelperText';
 import MenuItem from '@mui/material/MenuItem';
 import { getItems } from '../../store/ItemsSlice'
 import LastPageIcon from '@mui/icons-material/LastPage';
+import Checkbox from '@mui/material/Checkbox';
 import '../../css/modal.css';
 import { setEditableItem, resetEditableItem } from '../../store/EditableItemSlice';
 
 const AddOrEditItem = () => {
-
   const [currentError, setCurrentError] = useState(null);
   const dispatch = useDispatch();
   const isAddingOrEditingItem = useSelector((state) => state.isAddingOrEditingItem.value);
   const {editingID, editingQty, editingName, editingDescr, editingPurchased, inEditMode} = useSelector((state) => state.editableItem)
   
+  const formTitle = inEditMode ? "Edit an Item" : "Add an Item";
+  const formSubtitle = inEditMode ? "Edit your item below" : "Add your new item below"
+  const formButtonLabel = inEditMode ? "Save" : "Create"
+
   const handleClose = () => {
     resetForm();
     dispatch(resetEditableItem())
@@ -86,8 +91,8 @@ const AddOrEditItem = () => {
             }}>
               <div>
                 <div className="subtitle">
-                  <h4>Add an Item</h4>
-                  <div>Add your new item below</div>
+                  <h4>{formTitle}</h4>
+                  <div>{formSubtitle}</div>
                 </div>
                 <FormControl fullWidth required>
                   <TextField
@@ -138,14 +143,22 @@ const AddOrEditItem = () => {
                   </Select>
                   <FormHelperText>Required</FormHelperText>
                 </FormControl>
-
+                {inEditMode ? (
+                  <FormControlLabel control={(<Checkbox checked={editingPurchased} onChange={(event) => {
+                    const toSet = generateObjectFromCurrentValues();
+                    toSet.purchased = event.target.checked;
+                    dispatch(setEditableItem(toSet));
+                  }}/>)} label="Purchased" />
+                ) : (
+                  ""
+                )}
               </div>
               <div className="error">{currentError}</div>
             </Box>
           </DialogContent>
           <DialogActions>
           <Button variant="contained" onClick={handleClose}>Cancel</Button>
-          <Button variant="contained" onClick={handleSubmit}>Create</Button>
+          <Button variant="contained" onClick={handleSubmit}>{formButtonLabel}</Button>
         </DialogActions>
         </Dialog>
     </div>
