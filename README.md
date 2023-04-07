@@ -1,6 +1,6 @@
 Simple Shopping Cart Demo
 
-To run, clone this repo and build and run the container:
+To run, first clone this repo, and follow these steps:
 
 1. Make a .env file in the root directory with the following values:
 ```
@@ -32,6 +32,7 @@ docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' [YOU
 5. Navigate to the IP address in your browser to view the running app
 
 If you want to run the app locally but use the container's DB, you only need to DB_HOST env var to your container's IP.
+Make sure you have all NPM dependencies installed locally as well.
 The app can be launched from the desktop like so:
 ```
 go build -o shoppingcart && sudo ./shoppingcart
