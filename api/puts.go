@@ -3,12 +3,16 @@ package api
 import (
 	"database/sql"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strconv"
 	"veritone/sessions"
 
 	"github.com/gofrs/uuid"
 )
+
+const MAX_ITEM_NAME_LENGTH = 25
+const MAX_ITEM_DESCR_LENGTH = 100
 
 func PutListItem(w http.ResponseWriter, r *http.Request) {
 	sess, err := sessions.Get(r, "shopping_list")
@@ -42,6 +46,14 @@ func PutListItem(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
+	}
+	if len(listItem.Name) > MAX_ITEM_NAME_LENGTH || len(listItem.Name) == 0 {
+		http.Error(w, fmt.Sprintf("Name must be between 1 and %d characters", MAX_ITEM_NAME_LENGTH), http.StatusBadRequest)
+		return
+	}
+	if len(listItem.Description) > MAX_ITEM_DESCR_LENGTH {
+		http.Error(w, fmt.Sprintf("Description cannot be longer than %d characters", MAX_ITEM_DESCR_LENGTH), http.StatusBadRequest)
+		return
 	}
 	purchased := strconv.FormatBool(listItem.Purchased)
 	db := r.Context().Value("db").(*sql.DB)

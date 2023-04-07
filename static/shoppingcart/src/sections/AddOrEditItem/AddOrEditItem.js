@@ -20,6 +20,10 @@ import '../../css/modal.css';
 import { setEditableItem, resetEditableItem } from '../../store/EditableItemSlice';
 
 const AddOrEditItem = () => {
+
+  const MAX_NAME_LENGTH = 25;
+  const MAX_DESCR_LENGTH = 100;
+
   const [currentError, setCurrentError] = useState(null);
   const dispatch = useDispatch();
   const isAddingOrEditingItem = useSelector((state) => state.isAddingOrEditingItem.value);
@@ -52,6 +56,14 @@ const AddOrEditItem = () => {
   const handleSubmit = () => {
     if (!editingName.trim().length) {
       setCurrentError('Name cannot be blank');
+      return;
+    }
+    if (editingName.trim().length > MAX_NAME_LENGTH) {
+      setCurrentError('Name cannot be > ' + MAX_NAME_LENGTH + ' characters');
+      return;
+    }
+    if (editingDescr.trim().length > MAX_DESCR_LENGTH) {
+      setCurrentError('Description cannot be > ' + MAX_DESCR_LENGTH + ' characters');
       return;
     }
     if (editingQty < 1) {

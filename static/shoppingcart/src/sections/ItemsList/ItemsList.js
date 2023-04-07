@@ -21,6 +21,7 @@ const ItemsList = () => {
     const { items, loading, error } = useSelector((state) => state.items);
     const [checked, setChecked] = useState(items.filter(item => item.purchased === true).map(item => item.id));
     useEffect(() => {
+        console.log("items", items);
         setChecked(items.filter(item => item.purchased).map(item => item.id));
       }, [items]);
     const dispatch = useDispatch();
