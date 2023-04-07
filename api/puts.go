@@ -3,6 +3,7 @@ package api
 import (
 	"database/sql"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strconv"
 	"veritone/sessions"
@@ -44,6 +45,7 @@ func PutListItem(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
+	fmt.Println("putting", listItem.Quantity)
 
 	db := r.Context().Value("db").(*sql.DB)
 	var stmt *sql.Stmt

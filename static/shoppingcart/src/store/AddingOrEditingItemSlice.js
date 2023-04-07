@@ -8,7 +8,7 @@ export const addingOrEditingItemSlice = createSlice({
   reducers: {
     setAddingOrEditingItemState: (state, action) => {
       state.value = action.payload
-    }
+    },
   }
 });
 

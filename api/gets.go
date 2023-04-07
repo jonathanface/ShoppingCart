@@ -19,7 +19,7 @@ func GetAllItems(w http.ResponseWriter, r *http.Request) {
 	}
 
 	db := r.Context().Value("db").(*sql.DB)
-	stmt, err := db.Prepare("SELECT item_id, name, description, purchased FROM list_items WHERE list_id=$1")
+	stmt, err := db.Prepare("SELECT item_id, name, description, quantity, purchased FROM list_items WHERE list_id=$1")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -38,7 +38,7 @@ func GetAllItems(w http.ResponseWriter, r *http.Request) {
 	var items []Item = make([]Item, 0)
 	for rows.Next() {
 		var item Item
-		err := rows.Scan(&item.ID, &item.Name, &item.Description, &item.Purchased)
+		err := rows.Scan(&item.ID, &item.Name, &item.Description, &item.Quantity, &item.Purchased)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return

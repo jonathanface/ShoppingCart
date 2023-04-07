@@ -13,51 +13,53 @@ import InputLabel from '@mui/material/InputLabel';
 import FormHelperText from '@mui/material/FormHelperText';
 import MenuItem from '@mui/material/MenuItem';
 import { getItems } from '../../store/ItemsSlice'
-
 import LastPageIcon from '@mui/icons-material/LastPage';
 import '../../css/modal.css';
+import { setEditableItem, resetEditableItem } from '../../store/EditableItemSlice';
 
-const AddOrEditItem = (props) => {
+const AddOrEditItem = () => {
 
   const [currentError, setCurrentError] = useState(null);
-  const [currentName, setCurrentName] = useState("");
-  const [currentDescription, setCurrentDescription] = useState("");
-  const [currentQty, setCurrentQty] = useState(1);
   const dispatch = useDispatch();
   const isAddingOrEditingItem = useSelector((state) => state.isAddingOrEditingItem.value);
+  const {editingID, editingQty, editingName, editingDescr, editingPurchased, inEditMode} = useSelector((state) => state.editableItem)
   
   const handleClose = () => {
     resetForm();
+    dispatch(resetEditableItem())
     dispatch(setAddingOrEditingItemState(false));
   };
 
   const resetForm = () => {
-    setCurrentDescription("");
-    setCurrentName("");
-    setCurrentQty(1);
     setCurrentError("");
   }
 
+  const generateObjectFromCurrentValues =() => {
+    return {
+      id: editingID,
+      quantity: editingQty,
+      name: editingName,
+      description: editingDescr,
+      purchased: editingPurchased
+    }
+  }
+
   const handleSubmit = () => {
-    if (!currentName.trim().length) {
+    if (!editingName.trim().length) {
       setCurrentError('Name cannot be blank');
       return;
     }
-    if (currentQty < 1) {
+    if (editingQty < 1) {
       setCurrentError('Quantity must be > 0');
       return;
     }
-    const params = {};
-    params.name = currentName;
-    params.description = currentDescription;
-    params.quantity = currentQty;
-
+    const toSave = generateObjectFromCurrentValues();
     fetch('/api/items/put', {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify(params)
+      body: JSON.stringify(toSave)
     }).then((response) => {
       if (response.ok) {
         dispatch(getItems())
@@ -92,9 +94,11 @@ const AddOrEditItem = (props) => {
                     required
                     label="Item Name"
                     placeholder="Item Name"
-                    value={currentName}
+                    value={editingName}
                     onChange={(event) => {
-                      setCurrentName(event.target.value)
+                      const toSet = generateObjectFromCurrentValues();
+                      toSet.name = event.target.value;
+                      dispatch(setEditableItem(toSet));
                     }}
                   />
                 </FormControl>
@@ -102,9 +106,11 @@ const AddOrEditItem = (props) => {
                   <TextField
                     label="Description"
                     placeholder="Description"
-                    value={currentDescription}
+                    value={editingDescr}
                     onChange={(event) => {
-                      setCurrentDescription(event.target.value);
+                      const toSet = generateObjectFromCurrentValues();
+                      toSet.description = event.target.value;
+                      dispatch(setEditableItem(toSet));
                     }}
                     rows={4}
                     multiline
@@ -114,7 +120,7 @@ const AddOrEditItem = (props) => {
                   <InputLabel >How many?</InputLabel>
                   <Select
                     id="quantity-required"
-                    value={currentQty}
+                    value={editingQty}
                     placeholder="How many?"
                     label="How many?"
                     sx={{
@@ -123,7 +129,9 @@ const AddOrEditItem = (props) => {
                     
                     }}
                     onChange={(event) => {
-                      setCurrentQty(event.target.value);
+                      const toSet = generateObjectFromCurrentValues();
+                      toSet.quantity = event.target.value;
+                      dispatch(setEditableItem(toSet));
                     }}
                   >
                     {quantityOptions}

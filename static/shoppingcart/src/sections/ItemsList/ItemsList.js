@@ -1,4 +1,4 @@
-import React, {useState, useMemo, useEffect} from 'react';
+import React, {useState} from 'react';
 import {useSelector, useDispatch} from 'react-redux';
 import IconButton from '@mui/material/IconButton';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -14,17 +14,16 @@ import Typography from '@mui/material/Typography';
 import { setAddingOrEditingItemState } from '../../store/AddingOrEditingItemSlice';
 import '../../css/list.css';
 import { getItems } from '../../store/ItemsSlice'
+import { setEditableItem, setInEditMode } from '../../store/EditableItemSlice';
 
 const ItemsList = () => {
     
     const { items, loading, error } = useSelector((state) => state.items);
     const [checked, setChecked] = useState(items.filter(item => item.purchased).map(item => item.id));
     const dispatch = useDispatch();
-    console.log("checked", checked)
 
     const handlePurchasedToggle = (itemID) => () => {
         const currentIndex = checked.indexOf(itemID);
-        console.log("isChecked", itemID, checked);
         let newChecked = [...checked];
         const params = {};
         params.id = itemID;
@@ -35,7 +34,6 @@ const ItemsList = () => {
         } else {
             newChecked.splice(currentIndex, 1);
         }
-        console.log("new", newChecked);
         setChecked(newChecked);
         fetch('/api/items/transact', {
             method: 'PUT',
@@ -66,8 +64,10 @@ const ItemsList = () => {
           });
     }
 
-    const handleEdit = (id) => {
-        console.log("edit", id)
+    const handleEdit = (item) => {
+        dispatch(setEditableItem(item))
+        dispatch(setInEditMode(true))
+        dispatch(setAddingOrEditingItemState(true));
     }
 
     const elements = items.map(item => {
@@ -84,7 +84,7 @@ const ItemsList = () => {
                 }}
                 secondaryAction={
                     <div>
-                        <IconButton key={item.id + "_editBtn"} edge="end" aria-label="edit" onClick={()=>{handleEdit(item.id)}}>
+                        <IconButton key={item.id + "_editBtn"} edge="end" aria-label="edit" onClick={()=>{handleEdit(item)}}>
                             <EditIcon />
                         </IconButton>
                         <IconButton key={item.id + "_deleteBtn"}edge="end" aria-label="delete" onClick={()=>{handleDelete(item.id)}}>
@@ -120,6 +120,7 @@ const ItemsList = () => {
             <header>
                 <h4>Your Items</h4>
                 <Button variant="contained" onClick={()=>{
+                    dispatch(setInEditMode(false));
                     dispatch(setAddingOrEditingItemState(true));
                 }} sx={{
                     float:'right',
