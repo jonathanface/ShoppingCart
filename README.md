@@ -9,8 +9,8 @@ DB_PASS=sh0p
 DB_NAME=shopping_cart
 DB_HOST=localhost
 DB_PORT=5432
-VERSION =1.0
-SESSION_SECRET = QeThWmZq4t7w!z%C*F-JaNcRfUjXn2r5
+VERSION=1.0
+SESSION_SECRET=QeThWmZq4t7w!z%C*F-JaNcRfUjXn2r5
 ```
 
 1. Build the image:
