@@ -16,7 +16,7 @@ export const getItems = createAsyncThunk('api/items', async () => {
 export const ItemsSlice = createSlice({
   name: 'items',
   initialState: {
-    items: [],
+    items: null,
     loading: 'idle',
     error: null,
   },

@@ -5,23 +5,43 @@ import AddOrEditItem from './sections/AddOrEditItem/AddOrEditItem';
 import { getItems } from './store/ItemsSlice'
 import {useSelector, useDispatch} from 'react-redux';
 import ItemsList from './sections/ItemsList/ItemsList'
+import Backdrop from '@mui/material/Backdrop';
+import CircularProgress from '@mui/material/CircularProgress';
+import { setStandbyScreenVisibleState } from './store/StandbyScreenVisibleSlice';
 
 const ShoppingCart = () => {
 
     const dispatch = useDispatch();
     const { items, loading, error } = useSelector((state) => state.items)
+    const standbyScreenVisible = useSelector((state) => state.standbyScreenVisible)
 
     useEffect(() => {
-        dispatch(getItems())
-    }, [dispatch]);
-    console.log("items", items, loading, error)
+        if (loading === "idle" && !items) {
+            dispatch(getItems());
+        } else if (loading === "idle" && items) {
+            dispatch(setStandbyScreenVisibleState(false));
+        } else if (error) {
+            console.error("ERROR occurred fetching items:", error)
+        }
+    }, [dispatch, loading, error]);
+
+    const closeStandbyScreen = () => {
+        dispatch(setStandbyScreenVisibleState(false))
+      };
+
     return (
         <div>
             <header>SHOPPING LIST</header>
             <main>
             {items && items.length ? <ItemsList/> :  <div><Empty/><AddOrEditItem/></div>}
             </main>
-            
+            <Backdrop
+                sx={{ color: '#4C80B6', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+                open={standbyScreenVisible.value}
+                onClick={closeStandbyScreen}
+            >
+                <CircularProgress color="inherit" />
+            </Backdrop>
         </div>
     )
 }
