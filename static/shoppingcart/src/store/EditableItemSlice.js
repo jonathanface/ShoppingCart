@@ -22,7 +22,7 @@ export const EditableItemSlice = createSlice({
       state.inEditMode = action.payload;
     },
     resetEditableItem: (state) => {
-      state.editingID = "";
+      state.editingID = null;
       state.editingQty = 1;
       state.editingName = "";
       state.editingDescr = "";
