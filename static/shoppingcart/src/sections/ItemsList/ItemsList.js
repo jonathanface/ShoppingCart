@@ -11,7 +11,7 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import Checkbox from '@mui/material/Checkbox';
 import Typography from '@mui/material/Typography';
-import { flipAddingOrEditingItemState } from '../../store/AddingOrEditingItemSlice';
+import { setAddingOrEditingItemState } from '../../store/AddingOrEditingItemSlice';
 import '../../css/list.css';
 import { getItems } from '../../store/ItemsSlice'
 
@@ -120,7 +120,7 @@ const ItemsList = () => {
             <header>
                 <h4>Your Items</h4>
                 <Button variant="contained" onClick={()=>{
-                    dispatch(flipAddingOrEditingItemState());
+                    dispatch(setAddingOrEditingItemState(true));
                 }} sx={{
                     float:'right',
                     marginTop:'15px',

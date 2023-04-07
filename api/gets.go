@@ -3,7 +3,6 @@ package api
 import (
 	"database/sql"
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"veritone/sessions"
 )
@@ -34,8 +33,9 @@ func GetAllItems(w http.ResponseWriter, r *http.Request) {
 	}
 	defer rows.Close()
 
-	// Iterate over rows and create item objects
-	var items []Item
+	// Have to make() the slice b/c otherwise
+	// you get null for cases of empty tables
+	var items []Item = make([]Item, 0)
 	for rows.Next() {
 		var item Item
 		err := rows.Scan(&item.ID, &item.Name, &item.Description, &item.Purchased)
@@ -45,7 +45,6 @@ func GetAllItems(w http.ResponseWriter, r *http.Request) {
 		}
 		items = append(items, item)
 	}
-	fmt.Println("sending back", items)
 	// Convert products to JSON and write to response
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(items)

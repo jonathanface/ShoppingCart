@@ -6,12 +6,12 @@ export const addingOrEditingItemSlice = createSlice({
     value: false
   },
   reducers: {
-    flipAddingOrEditingItemState: (state) => {
-      state.value = !state.value;
+    setAddingOrEditingItemState: (state, action) => {
+      state.value = action.payload
     }
   }
 });
 
-export const {flipAddingOrEditingItemState} = addingOrEditingItemSlice.actions;
+export const {setAddingOrEditingItemState} = addingOrEditingItemSlice.actions;
 
 export default addingOrEditingItemSlice.reducer;

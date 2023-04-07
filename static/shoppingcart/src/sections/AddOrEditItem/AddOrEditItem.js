@@ -6,7 +6,7 @@ import TextField from '@mui/material/TextField';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
-import {flipAddingOrEditingItemState} from '../../store/AddingOrEditingItemSlice';
+import {setAddingOrEditingItemState} from '../../store/AddingOrEditingItemSlice';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import InputLabel from '@mui/material/InputLabel';
@@ -17,7 +17,7 @@ import { getItems } from '../../store/ItemsSlice'
 import LastPageIcon from '@mui/icons-material/LastPage';
 import '../../css/modal.css';
 
-const AddOrEditItem = (edit) => {
+const AddOrEditItem = (props) => {
 
   const [currentError, setCurrentError] = useState(null);
   const [currentName, setCurrentName] = useState("");
@@ -28,7 +28,7 @@ const AddOrEditItem = (edit) => {
   
   const handleClose = () => {
     resetForm();
-    dispatch(flipAddingOrEditingItemState());
+    dispatch(setAddingOrEditingItemState(false));
   };
 
   const resetForm = () => {

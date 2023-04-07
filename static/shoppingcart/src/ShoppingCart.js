@@ -25,20 +25,16 @@ const ShoppingCart = () => {
         }
     }, [dispatch, loading, error]);
 
-    const closeStandbyScreen = () => {
-        dispatch(setStandbyScreenVisibleState(false))
-      };
-
     return (
         <div>
             <header>SHOPPING LIST</header>
             <main>
-            {items && items.length ? <ItemsList/> :  <div><Empty/><AddOrEditItem/></div>}
+            {items && items.length ? <ItemsList/> :  <Empty/>}
+            <AddOrEditItem/>
             </main>
             <Backdrop
                 sx={{ color: '#4C80B6', zIndex: (theme) => theme.zIndex.drawer + 1 }}
                 open={standbyScreenVisible.value}
-                onClick={closeStandbyScreen}
             >
                 <CircularProgress color="inherit" />
             </Backdrop>
