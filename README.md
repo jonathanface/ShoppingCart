@@ -20,7 +20,7 @@ docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' [YOU
 ```
 5. Navigate to the IP address in your browser to view the running app
 
-
+To stop the container you will have to run ```docker ps stop [container_name]``` in another terminal.
 
 
 If you want to run the app locally but use the container's DB, make an .env file in the root directory with the following values:
