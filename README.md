@@ -3,13 +3,15 @@ Simple Shopping Cart Demo
 To run, clone this repo and build and run the container:
 
 1. Make a .env file in the root directory with the following values:
-    DB_USER=shopper
-    DB_PASS=sh0p
-    DB_NAME=shopping_cart
-    DB_HOST=localhost
-    DB_PORT=5432
-    VERSION =1.0
-    SESSION_SECRET = QeThWmZq4t7w!z%C*F-JaNcRfUjXn2r5
+```
+DB_USER=shopper
+DB_PASS=sh0p
+DB_NAME=shopping_cart
+DB_HOST=localhost
+DB_PORT=5432
+VERSION =1.0
+SESSION_SECRET = QeThWmZq4t7w!z%C*F-JaNcRfUjXn2r5
+```
 
 1. Build the image:
 ```
