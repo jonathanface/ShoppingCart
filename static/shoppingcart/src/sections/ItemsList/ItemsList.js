@@ -15,10 +15,14 @@ import {setAddingOrEditingItemState} from '../../store/AddingOrEditingItemSlice'
 import '../../css/list.css';
 import {getItems} from '../../store/ItemsSlice';
 import {setEditableItem, setInEditMode} from '../../store/EditableItemSlice';
+import {setDeletingItemState} from '../../store/DeletingItemStateSlice';
+import DeletePrompt from '../DeletePrompt/DeletePrompt';
 
 const ItemsList = () => {
+  const [currentItemToDelete, setCurrentItemToDelete] = useState(null);
   const {items, loading, error} = useSelector((state) => state.items);
   const [checked, setChecked] = useState(items.filter((item) => item.purchased === true).map((item) => item.id));
+
   useEffect(() => {
     console.log('items', items);
     setChecked(items.filter((item) => item.purchased).map((item) => item.id));
@@ -51,20 +55,9 @@ const ItemsList = () => {
     });
   };
 
-  const handleDelete = (id) => {
-    const params = {};
-    params.id = id;
-    fetch('/api/items', {
-      method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify([params])
-    }).then((response) => {
-      if (response.ok) {
-        dispatch(getItems());
-      }
-    });
+  const promptToDelete = (id) => {
+    setCurrentItemToDelete(id);
+    dispatch(setDeletingItemState(true));
   };
 
   const handleEdit = (item) => {
@@ -90,7 +83,7 @@ const ItemsList = () => {
             <IconButton key={item.id + '_editBtn'} edge="end" aria-label="edit" onClick={()=>{handleEdit(item);}}>
               <EditIcon />
             </IconButton>
-            <IconButton key={item.id + '_deleteBtn'}edge="end" aria-label="delete" onClick={()=>{handleDelete(item.id);}}>
+            <IconButton key={item.id + '_deleteBtn'}edge="end" aria-label="delete" onClick={()=>{promptToDelete(item.id);}}>
               <DeleteIcon />
             </IconButton>
           </div>
@@ -131,8 +124,8 @@ const ItemsList = () => {
           fontSize: '12px',
         }}>Add Item</Button>
       </header>
-      <List>{elements}
-      </List>
+      <List>{elements}</List>
+      <DeletePrompt item={currentItemToDelete}/>
     </div>
   );
 };

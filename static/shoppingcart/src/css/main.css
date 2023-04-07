@@ -23,7 +23,7 @@ main {
     
 }
 
-.MuiButton-contained {
+.MuiButton-contained, .MuiButton-text {
     text-transform:none !important;
 }
 
