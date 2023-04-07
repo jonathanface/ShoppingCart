@@ -105,6 +105,7 @@ func main() {
 	apiPath.Use(accessControlMiddleware)
 	apiPath.HandleFunc("/items", api.GetAllItems).Methods("GET", "OPTIONS")
 	apiPath.HandleFunc("/items/put", api.PutListItem).Methods("PUT", "OPTIONS")
+	apiPath.HandleFunc("/items", api.DeleteItems).Methods("DELETE", "OPTIONS")
 
 	rtr.PathPrefix("/").HandlerFunc(serveRootDirectory)
 	http.Handle("/", rtr)

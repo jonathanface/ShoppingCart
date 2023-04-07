@@ -1,0 +1,20 @@
+.shopping-list {
+    color:gray;
+    margin:0 auto !important;
+    width:50%;
+}
+
+.shopping-list header {
+    text-align: left;
+    margin-bottom:10px;
+}
+.shopping-list h4 {
+    margin-bottom:0;
+    color:#333;
+    display:inline-block;
+}
+
+.shopping-list .checked-item {
+    text-decoration: line-through;
+    background-color: #F8FAFC;
+}

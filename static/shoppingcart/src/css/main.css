@@ -4,14 +4,13 @@ html, body {
 }
 
 body {
-    
     color:#FFF;
     box-sizing: border-box;
     font-size:18px;
     font-family:"Nunito", sans-serif;
 }
 
-header {
+#root > div > header {
     background-color:#4C80B6;
     padding:20px;
     font-weight:bold;
@@ -26,4 +25,10 @@ main {
 
 .MuiButton-contained {
     text-transform:none !important;
+}
+
+.MuiTextField-root {
+    width:100% !important;
+    margin:0 !important;
+    margin-bottom:16px !important;
 }

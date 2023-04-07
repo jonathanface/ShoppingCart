@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import {useSelector, useDispatch} from 'react-redux';
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
@@ -6,60 +6,72 @@ import TextField from '@mui/material/TextField';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
-import Autocomplete from '@mui/material/Autocomplete';
 import {flipAddingItemState} from '../../store/AddingItemSlice';
+import FormControl from '@mui/material/FormControl';
+import Select from '@mui/material/Select';
+import InputLabel from '@mui/material/InputLabel';
+import FormHelperText from '@mui/material/FormHelperText';
+import MenuItem from '@mui/material/MenuItem';
 import { getItems } from '../../store/ItemsSlice'
+
 import LastPageIcon from '@mui/icons-material/LastPage';
 import '../../css/modal.css';
 
 const AddItem = () => {
 
   const [currentError, setCurrentError] = useState(null);
+  const [currentName, setCurrentName] = useState("");
+  const [currentDescription, setCurrentDescription] = useState("");
+  const [currentQty, setCurrentQty] = useState(1);
   const dispatch = useDispatch();
   const isAddingItem = useSelector((state) => state.isAddingItem.value);
-  const [formInput, setFormInput] = React.useState(new Map());
-
-  const { items, loading, error } = useSelector((state) => state.items)
-  useEffect(() => {
-    dispatch(getItems())
-  }, [dispatch]);
-
-  if (loading === 'idle' && items) {
-    //console.log("wtf", items);
-  }
-
-  const cartItems = items ? items.map(item => {
-    return {"label":item.name, "id":item.id, "description":item.description}
-  }) : []
-
+  
   const handleClose = () => {
     dispatch(flipAddingItemState());
   };
 
+  const resetForm = () => {
+    setCurrentDescription("");
+    setCurrentName("");
+    setCurrentQty(1);
+    setCurrentError("");
+  }
+
   const handleSubmit = () => {
-    console.log("data to send", formInput);
-    if (!formInput['name'] || !formInput['name'].trim().length) {
+    if (!currentName.trim().length) {
       setCurrentError('Name cannot be blank');
       return;
     }
-    if (formInput['quantity'] < 1) {
+    if (currentQty < 1) {
       setCurrentError('Quantity must be > 0');
       return;
     }
+    const params = {};
+    params.name = currentName;
+    params.description = currentDescription;
+    params.quantity = currentQty;
+
     fetch('/api/items/put', {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify(formInput)
+      body: JSON.stringify(params)
     }).then((response) => {
       if (response.ok) {
-        console.log("SCUCESS")
+        resetForm();
+        dispatch(getItems())
         handleClose();
+      } else {
+        setCurrentError(response.text);
       }
     });
   };
 
+  const quantityOptions = [];
+  for (let i=1; i < 11; i++) {
+      quantityOptions.push(<MenuItem key={"quantity_" + i} value={i}>{i}</MenuItem>)               
+  }
   return (
     <div>
       <Dialog open={isAddingItem} className="overlay" onClose={handleClose}>
@@ -71,41 +83,54 @@ const AddItem = () => {
               '& .MuiTextField-root': {m: 1, width: 300},
             }}>
               <div>
-                <h4>Add an Item</h4>
-                <Autocomplete
-                  required
-                  onInputChange={(event) => {
-                    formInput['name'] = event.target.value;
-                    setFormInput(formInput);
-                  }}
-                  onChange={(event, actions) => {
+                <div className="subtitle">
+                  <h4>Add an Item</h4>
+                  <div>Add your new item below</div>
+                </div>
+                <FormControl fullWidth required>
+                  <TextField
+                    required
+                    label="Item Name"
+                    placeholder="Item Name"
+                    value={currentName}
+                    onChange={(event) => {
+                      setCurrentName(event.target.value)
+                    }}
+                  />
+                </FormControl>
+                <FormControl fullWidth >
+                  <TextField
+                    label="Description"
+                    placeholder="Description"
+                    value={currentDescription}
+                    onChange={(event) => {
+                      setCurrentDescription(event.target.value);
+                    }}
+                    rows={4}
+                    multiline
+                  />
+                </FormControl>
+                <FormControl fullWidth required>
+                  <InputLabel >How many?</InputLabel>
+                  <Select
+                    id="quantity-required"
+                    value={currentQty}
+                    placeholder="How many?"
+                    label="How many?"
+                    sx={{
+                      padding: "8px",
+                      marginTop: "10px"
                     
-                  }}
-                  freeSolo
-                  options={cartItems}
-                  renderInput={(params) => <TextField {...params} label="Item Name" />}
-                />
-                <TextField
-                  label="Description"
-                  placeholder="Description"
-                  onChange={(event) => {
-                    formInput['description'] = event.target.value;
-                    setFormInput(formInput);
-                  }}
-                  multiline
-                />
-                <TextField
-                  label="How Many?"
-                  type="number"
-                  required
-                  InputProps={{
-                    inputProps: { min: 0 }
-                  }}
-                  onChange={(event) => {
-                    formInput['quantity'] = parseInt(event.target.value);
-                    setFormInput(formInput);
-                  }}
-                />
+                    }}
+                    onChange={(event) => {
+                      setCurrentQty(event.target.value);
+                    }}
+                  >
+                    {quantityOptions}
+                  </Select>
+                  <FormHelperText>Required</FormHelperText>
+                </FormControl>
+
               </div>
               <div className="error">{currentError}</div>
             </Box>

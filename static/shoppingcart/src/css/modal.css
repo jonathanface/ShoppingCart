@@ -5,6 +5,10 @@
 .overlay header {
     background-color: #fafafa;
     border:1px solid #ebf0f3;
+    font-family: "Dosis";
+    padding:20px;
+    font-weight:bold;
+    color:#5C6269;
 }
 .overlay header svg {
     float:right;
@@ -14,7 +18,21 @@
     opacity: 0.8;
 }
 
+.overlay .subtitle {
+    color:#5C6269;
+    padding-left:8px;
+    margin-bottom:5px;
+}
+.overlay .subtitle > div {
+    font-size:0.95rem;
+}
 .overlay h4 {
-    margin-top:0;
-    margin-bottom:0;
+    margin-top:5px;
+    margin-bottom:5px;
+}
+
+.overlay .error {
+    margin-left:10px;
+    font-weight:bold;
+    color:#b32929;
 }

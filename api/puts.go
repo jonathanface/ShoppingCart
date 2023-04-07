@@ -30,7 +30,6 @@ func PutListItem(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-	fmt.Println("sessid", sess.Values["list-id"])
 
 	//db := r.Context().Value("db").(*sql.DB)
 	decoder := json.NewDecoder(r.Body)
